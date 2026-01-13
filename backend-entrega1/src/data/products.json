@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": 1,
+    "status": true,
+    "thumbnails": [],
+    "title": "banana",
+    "price": 10,
+    "description": "producto realtime",
+    "code": "RT-1768260798691",
+    "stock": 10,
+    "category": "realtime"
+  }
+]

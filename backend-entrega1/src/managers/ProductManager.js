@@ -66,4 +66,14 @@ export default class ProductManager {
 
     await fs.writeFile(this.path, JSON.stringify(newProducts, null, 2));
   }
+
+  async deleteProduct(id) {
+  const products = await this.getProducts();
+
+  const filteredProducts = products.filter(p => String(p.id) !== String(id));
+
+  await fs.writeFile(this.path, JSON.stringify(filteredProducts, null, 2));
+
+  return filteredProducts;
+}
 }
