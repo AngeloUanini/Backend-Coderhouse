@@ -1,0 +1,48 @@
+<<h1>🛒 Mi carrito</h1>
+
+<a href="/products">⬅ Volver a productos</a>
+
+<hr>
+
+{{#if cart.products.length}}
+  <ul class="cart-list">
+    {{#each cart.products}}
+      <li class="cart-item">
+        <div>
+          <strong>{{this.product.title}}</strong><br>
+          Precio: ${{this.product.price}}<br>
+          Cantidad: {{this.quantity}}
+        </div>
+
+        <button onclick="removeFromCart('{{this.product._id}}')">
+          ❌ Eliminar
+        </button>
+      </li>
+    {{/each}}
+  </ul>
+{{else}}
+  <p>El carrito está vacío 🫥</p>
+{{/if}}
+
+<script>
+  const CART_ID = "{{cart._id}}";
+
+  async function removeFromCart(pid) {
+    const confirmDelete = confirm("¿Eliminar producto del carrito?");
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`/api/carts/${CART_ID}/products/${pid}`, {
+        method: "DELETE"
+      });
+
+      if (!res.ok) {
+        throw new Error("Error al eliminar");
+      }
+
+      location.reload(); // recarga la vista
+    } catch (error) {
+      alert("❌ No se pudo eliminar el producto");
+    }
+  }
+</script>

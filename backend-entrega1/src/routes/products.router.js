@@ -1,36 +1,61 @@
 import { Router } from "express";
-import ProductManager from "../managers/ProductManager.js";
+import ProductModel from "../models/Product.model.js";
 
 const router = Router();
-const productManager = new ProductManager("./src/data/products.json");
 
 // GET / → listar todos los productos
 router.get("/", async (req, res) => {
-  const products = await productManager.getProducts();
-  res.json(products);
-});
+  try {
+    const { limit = 10, page = 1, sort, query } = req.query;
 
-// GET /:pid → obtener producto por ID
-router.get("/:pid", async (req, res) => {
-  const { pid } = req.params;
-  const product = await productManager.getProductById(pid);
+    let filter = {};
+    if (query) {
+      const [key, value] = query.split(":");
+      filter[key] = value === "true" ? true : value;
+    }
 
-  if (!product) {
-    return res.status(404).json({ error: "Producto no encontrado" });
+    let sortOption = {};
+    if (sort === "asc") sortOption.price = 1;
+    if (sort === "desc") sortOption.price = -1;
+
+    const result = await ProductModel.paginate(filter, {
+      limit: Number(limit),
+      page: Number(page),
+      sort: sortOption,
+      lean: true
+    });
+
+    res.json({
+      status: "success",
+      payload: result.docs,
+      totalPages: result.totalPages,
+      prevPage: result.prevPage,
+      nextPage: result.nextPage,
+      page: result.page,
+      hasPrevPage: result.hasPrevPage,
+      hasNextPage: result.hasNextPage,
+      prevLink: result.hasPrevPage
+        ? `/api/products?page=${result.prevPage}`
+        : null,
+      nextLink: result.hasNextPage
+        ? `/api/products?page=${result.nextPage}`
+        : null
+    });
+  } catch (error) {
+    res.status(500).json({ status: "error", error: error.message });
   }
-
-  res.json(product);
 });
 
 // POST / → agregar producto
 router.post("/", async (req, res) => {
   try {
-    const newProduct = await productManager.addProduct(req.body);
-    res.status(201).json(newProduct);
+    const product = await ProductModel.create(req.body);
+    res.status(201).json(product);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
+
 
 // PUT /:pid → actualizar producto
 router.put("/:pid", async (req, res) => {

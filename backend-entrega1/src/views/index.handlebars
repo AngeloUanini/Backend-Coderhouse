@@ -1,0 +1,81 @@
+<h1>🛍️ Productos</h1>
+
+<div class="actions">
+  <a class="cart-link" href="/carts/{{cartId}}">
+    🛒 Ver carrito
+  </a>
+</div>
+
+<hr>
+
+{{#if products.length}}
+  <div class="products">
+    {{#each products}}
+      <div class="product-card">
+        <h3>{{this.title}}</h3>
+
+        <p>{{this.description}}</p>
+
+        <p class="price">
+          <strong>$ {{this.price}}</strong>
+        </p>
+
+        <p class="category">
+          Categoría: {{this.category}}
+        </p>
+
+        <p class="stock">
+          Stock: {{this.stock}}
+        </p>
+
+        <div class="buttons">
+          <a href="/products/{{this._id}}">
+            Ver detalle
+          </a>
+
+          <button onclick="addToCart('{{this._id}}')">
+            Agregar al carrito
+          </button>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+{{else}}
+  <p>❌ No hay productos disponibles</p>
+{{/if}}
+
+<hr>
+
+<div class="pagination">
+  {{#if prevLink}}
+    <a href="{{prevLink}}">⬅ Anterior</a>
+  {{/if}}
+
+  <span>
+    Página {{page}} de {{totalPages}}
+  </span>
+
+  {{#if nextLink}}
+    <a href="{{nextLink}}">Siguiente ➡</a>
+  {{/if}}
+</div>
+
+<script>
+  const CART_ID = "{{cartId}}";
+
+  async function addToCart(pid) {
+    try {
+      const res = await fetch(`/api/carts/${CART_ID}/products/${pid}`, {
+        method: "POST"
+      });
+
+      if (!res.ok) {
+        throw new Error("Error al agregar producto");
+      }
+
+      alert("✅ Producto agregado al carrito");
+    } catch (error) {
+      alert("❌ No se pudo agregar el producto");
+    }
+  }
+</script>

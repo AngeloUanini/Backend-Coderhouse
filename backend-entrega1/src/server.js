@@ -2,6 +2,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import app from "./app.js";
 import ProductManager from "./managers/ProductManager.js";
+import { connectDB } from "./config/db.js";
+
 
 const httpServer = createServer(app);
 const io = new Server(httpServer);
@@ -50,3 +52,4 @@ httpServer.listen(8080, () => {
   console.log("Servidor escuchando en puerto 8080");
 });
 
+connectDB();
